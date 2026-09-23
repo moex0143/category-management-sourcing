@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Category Management and Sourcing</title>
+  <style>
+    /* ═══════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-950: #04080f;
+      --navy-900: #070e1c;
+      --navy-800: #0a1525;
+      --navy-700: #0e2040;
+      --navy-600: #112852;
+      --navy-500: #183470;
+      --purple-950: #0d0230;
+      --purple-900: #160748;
+      --purple-800: #220e64;
+      --purple-700: #341880;
+      --purple-600: #4e269e;
+      --teal:      #00bfc8;
+      --teal-dark: #008f96;
+      --orange:    #ff8c38;
+      --orange-bg: rgba(255,140,56,0.14);
+      --green:     #18b86a;
+      --green-bg:  rgba(24,184,106,0.11);
+      --page-bg:   #edf1f7;
+      --white:     #ffffff;
+      --text:      #0e1a30;
+      --text-mid:  #3a4a68;
+      --border:    #d0daea;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOP NAV
+    ═══════════════════════════════════════════════ */
+    .top-nav {
+      background: var(--page-bg);
+      padding: 14px 24px;
+      border-bottom: 1px solid #d8e2ee;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-mid);
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 16px;
+      transition: box-shadow .15s;
+    }
+    .back-link:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+
+    /* ═══════════════════════════════════════════════
+       PAGE OUTER CONTAINER — wider, less padding
+    ═══════════════════════════════════════════════ */
+    .page-outer {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: 20px 20px 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       HEADER CARD — no number, left-padded body
+    ═══════════════════════════════════════════════ */
+    .header-card {
+      background: linear-gradient(108deg,
+        #04080f  0%,
+        #070e1c  12%,
+        #0a1830  30%,
+        #0e2550  62%,
+        #132e6a  85%,
+        #163274 100%);
+      border-radius: 14px;
+      padding: 30px 44px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .hdr-eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 6px;
+    }
+    .hdr-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .hdr-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hdr-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.58);
+      background: rgba(255,255,255,0.07);
+      white-space: nowrap;
+    }
+    .hdr-pill strong { color: var(--teal); font-weight: 700; }
+
+    /* ═══════════════════════════════════════════════
+       THREE PANELS ROW
+    ═══════════════════════════════════════════════ */
+    .panels-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 0;
+    }
+    .panel {
+      border-radius: 12px;
+      padding: 22px 20px;
+      color: #fff;
+    }
+    .panel-eyebrow {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .panel h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    /* ── Current State ── */
+    .panel-current { background: var(--navy-600); }
+    .panel-current .panel-eyebrow { color: var(--teal); }
+    .current-list { list-style: none; }
+    .current-list li {
+      position: relative;
+      padding: 8px 0 8px 16px;
+      font-size: 13.5px;
+      color: #b8cee2;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .current-list li:last-child { border-bottom: none; }
+    .current-list li::before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: 14px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+    .current-hl {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--teal);
+      margin-top: 3px;
+      letter-spacing: .4px;
+    }
+
+    /* ── SAP Recommendation ── */
+    .panel-rec { background: var(--navy-800); }
+    .panel-rec .panel-eyebrow { color: #7ab4d4; }
+
+    .agents-table-wrap {
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .agents-table-hdr {
+      background: rgba(80,120,200,0.28);
+      padding: 7px 12px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #90b8d8;
+    }
+    .agents-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .agents-table thead tr { background: rgba(60,90,160,0.22); }
+    .agents-table thead th {
+      padding: 6px 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #7a9ab8;
+      text-align: left;
+    }
+    .agents-table thead th:not(:first-child) { text-align: center; }
+    .agents-table tbody tr {
+      background: rgba(40,70,130,0.18);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .agents-table tbody tr:last-child { border-bottom: none; }
+    .agents-table td {
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #c8dced;
+    }
+    .agents-table td:not(:first-child) { text-align: center; }
+    .oct-badge {
+      display: inline-block;
+      background: var(--orange-bg);
+      color: var(--orange);
+      border: 1px solid rgba(255,140,56,.28);
+      border-radius: 3px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .rec-bullets { margin-top: 0; }
+    .rec-bullet {
+      position: relative;
+      padding: 7px 0 7px 16px;
+      font-size: 12.5px;
+      color: #b0c8e0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .rec-bullet:last-child { border-bottom: none; }
+    .rec-bullet::before { content: "→"; position: absolute; left: 0; color: var(--teal); font-size: 12px; line-height: 1.7; }
+    .rec-bullet strong { color: #fff; }
+
+    /* ── NextGen ── */
+    .panel-nextgen {
+      background: linear-gradient(148deg,
+        var(--purple-950) 0%,
+        var(--purple-900) 30%,
+        var(--purple-800) 65%,
+        var(--purple-700) 100%);
+    }
+    .panel-nextgen .panel-eyebrow { color: #b89cdc; }
+    .ng-sub {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .9px;
+      text-transform: uppercase;
+      color: #c4a8e8;
+      margin-bottom: 8px;
+    }
+    .ng-list { list-style: none; margin-bottom: 12px; }
+    .ng-list li {
+      position: relative;
+      padding: 4px 0 4px 14px;
+      font-size: 13px;
+      color: #ddd0f8;
+    }
+    .ng-list li::before {
+      content: "";
+      position: absolute;
+      left: 1px; top: 10px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #9c7de0;
+    }
+    .ng-list li strong { color: #fff; }
+    .ng-desc {
+      position: relative;
+      padding: 5px 0 5px 14px;
+      font-size: 12px;
+      color: #c0b0e4;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      line-height: 1.5;
+    }
+    .ng-desc:last-child { border-bottom: none; }
+    .ng-desc::before { content: "▸"; position: absolute; left: 0; color: #8060c0; font-size: 10px; top: 6px; }
+
+    /* ═══════════════════════════════════════════════
+       STATS BAR
+    ═══════════════════════════════════════════════ */
+    .stats-bar {
+      display: flex;
+      background: var(--navy-700);
+      margin: 14px 0 0;
+      border-radius: 0 0 12px 12px;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 12px 28px;
+      border-right: 1px solid rgba(255,255,255,.09);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #6090b8;
+      margin-bottom: 3px;
+    }
+    .stat-val { font-size: 16px; font-weight: 700; color: #fff; }
+
+    /* ═══════════════════════════════════════════════
+       CONTENT SECTIONS — full width, wide inner
+    ═══════════════════════════════════════════════ */
+    .content-section { padding: 44px 0 8px; }
+    .content-section.alt { background: #f6f9fc; }
+
+    .section-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .sec-eyebrow {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 5px;
+    }
+    .sec-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .sec-rule {
+      height: 2px;
+      background: linear-gradient(to right, var(--teal), rgba(0,191,200,.12));
+      border: none;
+      margin-bottom: 36px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       VIDEO BLOCKS
+    ═══════════════════════════════════════════════ */
+    .video-block {
+      padding-bottom: 48px;
+      border-bottom: 1px solid #dce8f0;
+      margin-bottom: 40px;
+    }
+    .video-block:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 20px;
+    }
+
+    .avail-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 16px;
+      border-radius: 16px;
+      margin-bottom: 14px;
+    }
+    .avail-now {
+      background: var(--green-bg);
+      color: #0a6e3e;
+      border: 1px solid rgba(24,184,106,.28);
+    }
+    .avail-oct {
+      background: var(--orange-bg);
+      color: #8a4800;
+      border: 1px solid rgba(255,140,56,.28);
+    }
+    .avail-future {
+      background: rgba(100,120,200,0.10);
+      color: #2a3a7a;
+      border: 1px solid rgba(100,120,200,.28);
+    }
+    .avail-nextgen {
+      background: rgba(100,60,190,0.10);
+      color: #4a1a8a;
+      border: 1px solid rgba(110,60,200,.28);
+    }
+
+    .vb-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px;
+      line-height: 1.25;
+    }
+    .vb-subtitle {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--teal);
+      margin-bottom: 16px;
+    }
+    .vb-desc {
+      font-size: 15.5px;
+      color: #3a4a60;
+      line-height: 1.75;
+      margin-bottom: 28px;
+      max-width: 1100px;
+    }
+
+    /* VIDEO PLAYER — fills content width */
+    .video-player-wrap {
+      width: 94%;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 12px 48px rgba(0,0,0,.30), 0 2px 10px rgba(0,0,0,.18);
+    }
+    .video-player-wrap video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+    }
+    .video-caption {
+      font-size: 12.5px;
+      color: #7a8aa0;
+      font-style: italic;
+      margin-top: 12px;
+      text-align: center;
+      width: 94%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ═══════════════════════════════════════════════
+       FOUNDATION DIAGRAM
+    ═══════════════════════════════════════════════ */
+    .foundation-wrap {
+      background: linear-gradient(158deg, #d4e2f6 0%, #dbe8fc 55%, #cfd9f0 100%);
+      padding: 40px 0 44px;
+    }
+    .foundation-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .found-hdr {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+    .found-diamond {
+      width: 12px; height: 12px;
+      background: var(--teal);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+    .found-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #091c48;
+    }
+
+    .found-grid {
+      display: grid;
+      grid-template-columns: 1fr 110px 1fr;
+      gap: 0;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    /* Left card */
+    .found-left {
+      background: rgba(130,144,206,0.32);
+      border: 1px solid rgba(100,118,196,.3);
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .found-card-hdr {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(100,120,194,.22);
+    }
+    .found-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .found-icon.purple { background: rgba(120,100,210,.25); color: #9478dc; }
+    .found-icon.teal   { background: rgba(0,191,200,.18);   color: var(--teal); }
+    .found-card-title  { font-size: 15px; font-weight: 700; color: #14205a; }
+
+    .bdc-card {
+      background: rgba(100,92,188,.24);
+      border: 1px solid rgba(108,100,200,.3);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+    .bdc-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #7878b8;
+      margin-bottom: 7px;
+    }
+    .bdc-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .bdc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(80,76,170,.3);
+      border: 1px solid rgba(110,106,210,.38);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #c0c0f0;
+      white-space: nowrap;
+    }
+    .bdc-feeds {
+      font-size: 11px;
+      color: #8888b8;
+      font-style: italic;
+    }
+    .bdc-desc {
+      font-size: 12px;
+      color: #484890;
+      line-height: 1.55;
+    }
+    .bdc-desc strong { color: #303090; }
+
+    .found-bullets { list-style: none; }
+    .found-bullets li {
+      position: relative;
+      padding: 5px 0 5px 16px;
+      font-size: 14px;
+      color: #1e2860;
+    }
+    .found-bullets li::before {
+      content: "";
+      position: absolute;
+      left: 1px; top: 11px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    /* Middle: Joule bridge */
+    .found-mid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 4px;
+    }
+    .found-mid-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .9px;
+      text-transform: uppercase;
+      color: #5a6e8a;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .joule-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #7c56c4;
+    }
+    .mid-chevrons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .chevron {
+      width: 11px; height: 11px;
+      border-right: 2px solid #8898b8;
+      border-bottom: 2px solid #8898b8;
+      transform: rotate(45deg);
+    }
+    .found-mid-bot {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: #5a6e8a;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    /* Right card */
+    .found-right-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .found-right-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #4a6888;
+      text-align: right;
+      margin-bottom: 8px;
+    }
+    .found-right {
+      flex: 1;
+      background: rgba(90,140,206,.26);
+      border: 1px solid rgba(72,126,200,.28);
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .found-right .found-bullets li { color: #12205a; }
+
+    .found-note {
+      font-size: 15px;
+      color: #283050;
+      line-height: 1.75;
+    }
+    .found-note strong { color: #091840; }
+
+    /* ═══════════════════════════════════════════════
+       VALUE PROPOSITION SECTION
+    ═══════════════════════════════════════════════ */
+    .value-section {
+      padding: 32px 0 0;
+      background: var(--page-bg);
+    }
+    .value-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Key Question Banner */
+    .key-q-banner {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: linear-gradient(105deg, #043838 0%, #005a5a 40%, #007a7a 100%);
+      border-radius: 12px;
+      padding: 20px 32px;
+      box-shadow: 0 4px 20px rgba(0,140,140,0.22);
+    }
+    .key-q-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .key-q-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 4px;
+    }
+    .key-q-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .key-q-text strong { color: var(--teal); }
+
+    /* Why It Matters Card */
+    .why-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.14);
+    }
+    .why-dark {
+      background: linear-gradient(105deg, #07101f 0%, #0b1d3a 35%, #102448 65%, #061530 100%);
+      padding: 32px 40px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* subtle texture overlay */
+    .why-dark::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(0,191,200,0.07) 0%, transparent 65%),
+                  radial-gradient(ellipse at 10% 80%, rgba(80,40,160,0.08) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .why-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .why-title {
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      max-width: 700px;
+      position: relative;
+    }
+
+    /* KPI Stats Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: #fff;
+    }
+    .kpi-card {
+      padding: 28px 32px 24px;
+      border-right: 1px solid #e0e8f0;
+      position: relative;
+    }
+    .kpi-card:last-child { border-right: none; }
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(to right, rgba(0,191,200,0.3), rgba(0,191,200,0.05));
+    }
+    .kpi-num {
+      font-size: 54px;
+      font-weight: 900;
+      color: #0b1d3a;
+      line-height: 1;
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+    }
+    .kpi-unit {
+      font-size: 38px;
+      font-weight: 900;
+      color: var(--teal);
+      letter-spacing: -1px;
+    }
+    .kpi-desc {
+      font-size: 14px;
+      color: #3a4a68;
+      line-height: 1.55;
+      max-width: 180px;
+    }
+
+    /* ── Featured / Emphasized KPI cards ── */
+    .kpi-card.featured {
+      background: linear-gradient(148deg, #071628 0%, #0d2248 55%, #112d60 100%);
+      border-right: 1px solid rgba(0,191,200,.18);
+      position: relative;
+    }
+    .kpi-card.featured::after {
+      height: 4px;
+      background: linear-gradient(to right, var(--teal), #00e8e8);
+      box-shadow: 0 0 10px rgba(0,220,220,0.55);
+    }
+    .kpi-card.featured .kpi-num  { color: #ffffff; }
+    .kpi-card.featured .kpi-unit { color: var(--teal); filter: drop-shadow(0 0 6px rgba(0,220,220,0.6)); }
+    .kpi-card.featured .kpi-desc { color: #a8c8e8; max-width: 200px; }
+    .featured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--teal);
+      background: rgba(0,191,200,0.12);
+      border: 1px solid rgba(0,191,200,0.28);
+      border-radius: 10px;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+    }
+
+    /* Source */
+    .kpi-source {
+      background: #f5f8fc;
+      padding: 12px 32px;
+      font-size: 11px;
+      color: #7a8aa4;
+      border-top: 1px solid #e2eaf4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .kpi-source-right {
+      margin-left: auto;
+      font-weight: 600;
+      color: #9a6060;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* KPI Callout — inline stat tie-back */
+    .kpi-callout {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(to right, rgba(0,191,200,0.09), rgba(0,191,200,0.03));
+      border: 1px solid rgba(0,191,200,0.32);
+      border-left: 4px solid var(--teal);
+      border-radius: 0 8px 8px 0;
+      padding: 8px 18px 8px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #073838;
+      margin-bottom: 18px;
+    }
+    .kpi-callout-num {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--teal);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .kpi-callout-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a3a50;
+      line-height: 1.35;
+    }
+
+    /* ═══════════════════════════════════════════════
+       JOULE GEM ANIMATIONS
+    ═══════════════════════════════════════════════ */
+    @keyframes joule-pulse {
+      0%, 100% {
+        filter: drop-shadow(0 0 4px rgba(147,51,234,0.45))
+                drop-shadow(0 0 8px rgba(232,121,249,0.25));
+        transform: scale(1);
+      }
+      50% {
+        filter: drop-shadow(0 0 14px rgba(232,121,249,0.90))
+                drop-shadow(0 0 28px rgba(147,51,234,0.65))
+                drop-shadow(0 0 44px rgba(99,60,220,0.40));
+        transform: scale(1.07);
+      }
+    }
+
+    @keyframes joule-shine {
+      0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+      18%  { opacity: 1; }
+      38%  { transform: translateX(140%) skewX(-20deg); opacity: 0; }
+      100% { transform: translateX(140%) skewX(-20deg); opacity: 0; }
+    }
+
+    @keyframes joule-float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-5px); }
+    }
+
+    .joule-gem-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      animation: joule-float 3.6s ease-in-out infinite;
+    }
+
+    .joule-gem-wrap svg {
+      animation: joule-pulse 2.8s ease-in-out infinite;
+      transition: transform .2s;
+    }
+
+    /* shine sweep overlay */
+    .joule-gem-wrap::before {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: -30%;
+      width: 30%;
+      height: 70%;
+      background: linear-gradient(
+        105deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.55) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      border-radius: 4px;
+      animation: joule-shine 3.6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* sparkle dots */
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+      40%       { opacity: 1; transform: scale(1) rotate(20deg); }
+      70%       { opacity: 0.6; transform: scale(0.7) rotate(40deg); }
+    }
+    .joule-gem-wrap::after {
+      content: "✦";
+      position: absolute;
+      top: -6px;
+      right: -4px;
+      font-size: 13px;
+      color: #e879f9;
+      animation: sparkle 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* hover — extra burst */
+    .joule-gem-wrap:hover svg {
+      filter: drop-shadow(0 0 20px rgba(232,121,249,1))
+              drop-shadow(0 0 40px rgba(147,51,234,0.85)) !important;
+      transform: scale(1.14);
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .panels-row { grid-template-columns: 1fr; gap: 10px; }
+      .found-grid  { grid-template-columns: 1fr; }
+      .found-mid   { flex-direction: row; padding: 16px 0; }
+      .hdr-title   { font-size: 26px; }
+      .video-player-wrap, .video-caption { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     TOP NAV
+═════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <a href="#" class="back-link">← Back to Overview</a>
+</nav>
+
+
+<!-- ════════════════════════════════════════════════
+     PAGE CONTAINER
+═════════════════════════════════════════════════ -->
+<div class="page-outer">
+
+  <!-- HEADER CARD -->
+  <div class="header-card">
+    <div class="hdr-eyebrow">Category Management &amp; eSourcing</div>
+    <h1 class="hdr-title">Category Management and Sourcing</h1>
+    <div class="hdr-pills">
+      <span class="hdr-pill">Category strategy: <strong>Manual today</strong></span>
+      <span class="hdr-pill">Spend intelligence: <strong>Limited visibility</strong></span>
+      <span class="hdr-pill">Sourcing agents: <strong>3 OOB Oct 2026</strong></span>
+    </div>
+  </div>
+
+  <!-- THREE PANELS -->
+  <div class="panels-row">
+
+    <!-- Current State -->
+    <div class="panel panel-current">
+      <div class="panel-eyebrow">Current State</div>
+      <h3>Where You Are Today</h3>
+      <ul class="current-list">
+        <li>
+          Category strategy is managed manually — no AI in category planning, market intelligence, or strategic supplier positioning today.
+          <span class="current-hl">Zero AI in category management</span>
+        </li>
+        <li>Sourcing events are run manually through classic Ariba Sourcing — limited automation across the spend portfolio.</li>
+        <li>RFx process is resource-intensive and slow — sourcing teams spend significant time on process administration rather than strategic supplier engagement.</li>
+        <li>No unified spend intelligence platform — category managers lack a centralized view of spend data, supplier concentration, and savings opportunity pipeline.</li>
+      </ul>
+    </div>
+
+    <!-- SAP Recommendation -->
+    <div class="panel panel-rec">
+      <div class="panel-eyebrow">SAP Recommendation &nbsp;·&nbsp; Joule: Now → Next</div>
+      <h3>Deploy the Agents, Build the Intelligence Layer</h3>
+
+      <div class="agents-table-wrap">
+        <div class="agents-table-hdr">FIX IT NOW — Classic Ariba + Joule Agents</div>
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Current Gen</th>
+              <th>Next Gen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="3" style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6a8eaa;padding:5px 10px 3px;background:rgba(30,60,120,.18);">Sourcing</td>
+            </tr>
+            <tr>
+              <td>Sourcing Assistant</td>
+              <td><span class="oct-badge">Oct 2026</span></td>
+              <td><span class="oct-badge">Oct 2026</span></td>
+            </tr>
+            <tr>
+              <td>Bid Analysis Agent</td>
+              <td><span class="oct-badge">Oct 2026</span></td>
+              <td><span class="oct-badge">Oct 2026</span></td>
+            </tr>
+            <tr>
+              <td>Award Optimization Agent</td>
+              <td><span class="oct-badge">Oct 2026</span></td>
+              <td><span class="oct-badge">Oct 2026</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rec-bullets">
+        <div class="rec-bullet"><strong>Activate AI-Assisted Sourcing</strong> across additional spend categories — use the existing Ariba investment to drive more automated sourcing events across the tail.</div>
+        <div class="rec-bullet"><strong>Activate Spend Analytics and Intelligence (BDC)</strong> — Ariba Triple Crown: unified spend analytics across all categories with AI-identified savings opportunities.</div>
+      </div>
+    </div>
+
+    <!-- NextGen Ariba -->
+    <div class="panel panel-nextgen">
+      <div class="panel-eyebrow">NextGen Ariba &nbsp;·&nbsp; Complete Transformation</div>
+      <h3>Autonomous Sourcing at Enterprise Scale</h3>
+      <div class="ng-sub">Category + Spend Analytics and Intelligence Agents — NextGen Ariba</div>
+      <ul class="ng-list">
+        <li><strong>Category Management Assistant</strong> &nbsp;·&nbsp; strategy execution &amp; pipeline</li>
+        <li><strong>Spend Analysis Agent</strong> &nbsp;·&nbsp; pattern intelligence &amp; benchmarks</li>
+        <li><strong>Spend Opportunity Agent</strong> &nbsp;·&nbsp; AI-identified savings pipeline</li>
+        <li><strong>Market Insights Agent</strong> &nbsp;·&nbsp; external signals &amp; pricing</li>
+        <li><strong>Category Strategy Development Agent</strong> &nbsp;·&nbsp; AI-assisted category planning</li>
+      </ul>
+      <div class="ng-desc">Autonomous sourcing for tactical and MRO categories — Joule agents run events end-to-end: requirement intake, supplier shortlisting, RFx, negotiation support, and award. No human in the loop for routine spend.</div>
+      <div class="ng-desc">SAP Sourcing Assistants are production-grade AI agents, continuously trained on live supplier and market data — built for enterprise scale and governed by SAP's security and compliance standards.</div>
+      <div class="ng-desc">Ariba Triple Crown fully activated: Category Management + Spend Analytics and Intelligence (BDC) + Intelligent Sourcing — the complete strategic sourcing suite.</div>
+      <div class="ng-desc">NextGen Strategic Sourcing Suite: AI-native category planning, supplier relationship management, and market intelligence in a unified NextGen UX.</div>
+      <div class="ng-desc">Strategic sourcing team shifts from process administration to high-value supplier relationships and market strategy — Joule handles the execution layer.</div>
+      <div class="ng-desc">Savings identification becomes continuous and proactive — Joule surfaces opportunities before the annual sourcing cycle, not during it.</div>
+    </div>
+
+  </div><!-- /panels-row -->
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">Category AI</div>
+      <div class="stat-val">3 OOB agents &nbsp;·&nbsp; Oct 2026</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">RFx Cycle Time</div>
+      <div class="stat-val">Minutes with Joule</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Spend Intelligence</div>
+      <div class="stat-val">BDC: unified intelligence</div>
+    </div>
+
+  </div>
+
+</div><!-- /page-outer -->
+
+
+<!-- ════════════════════════════════════════════════
+     VALUE PROPOSITION
+═════════════════════════════════════════════════ -->
+<div class="value-section">
+  <div class="value-inner">
+
+    <!-- Key Question -->
+    <div class="key-q-banner">
+      <div class="key-q-icon">🎯</div>
+      <div>
+        <div class="key-q-label">Key Question</div>
+        <div class="key-q-text">What is your <strong>Savings Target?</strong></div>
+      </div>
+    </div>
+
+    <!-- Why Category Management Matters -->
+    <div class="why-card">
+
+      <div class="why-dark">
+        <div class="why-eyebrow">Why Category Management Matters</div>
+        <div class="why-title">Category Management Leaders Deliver Significantly More Value</div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card featured">
+          <div class="featured-badge">★ &nbsp;Cost Savings</div>
+          <div class="kpi-num">2.3<span class="kpi-unit">X</span></div>
+          <div class="kpi-desc">More cost savings realized vs. "starters"</div>
+        </div>
+        <div class="kpi-card featured">
+          <div class="featured-badge">★ &nbsp;Spend Coverage</div>
+          <div class="kpi-num">85<span class="kpi-unit">%</span></div>
+          <div class="kpi-desc">of spend covered under management</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">2.2<span class="kpi-unit">X</span></div>
+          <div class="kpi-desc">More revenue and stakeholder value vs. "starters"</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">1.8<span class="kpi-unit">X</span></div>
+          <div class="kpi-desc">More risk opportunities secured vs. "starters"</div>
+        </div>
+      </div>
+
+      <div class="kpi-source">
+        Source: Fast tracking category management excellence by Future Purchasing, in collaboration with Henley Business School University of Reading, 2022
+        <span class="kpi-source-right">INTERNAL — SAP and Partners Only</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     SECTION 1 — CATEGORY MANAGEMENT
+═════════════════════════════════════════════════ -->
+<div class="content-section">
+  <div class="section-inner">
+
+    <div class="sec-eyebrow">Category Management</div>
+    <h2 class="sec-title">Building the Intelligence Foundation</h2>
+    <hr class="sec-rule" />
+
+    <!-- Video 1 -->
+    <div class="video-block">
+      <span class="avail-tag avail-now">✓ &nbsp;Available Today</span>
+      <div class="vb-title">Create Category Plan — Remove the Manual Effort</div>
+      <div class="vb-subtitle">The Path to 85% Spend Under Management Starts Here</div>
+      <div class="kpi-callout">
+        <span class="kpi-callout-num">85%</span>
+        <span class="kpi-callout-text">of spend covered under management — the benchmark category leaders achieve</span>
+      </div>
+      <p class="vb-desc">Category management leaders cover 85% of their spend under active management — but that only happens when every category has a structured plan behind it. Without structured plans, spend remains fragmented, supplier leverage is lost, and savings opportunities are invisible. SAP Ariba Category Management provides the platform to build and maintain those plans at scale, centralizing spend data, market intelligence, supplier information, and strategy in one place. Every category plan created here is one step closer to full spend coverage — and the cost discipline that separates leaders from starters.</p>
+      <div class="video-player-wrap">
+        <video controls>
+          <source src="https://moex0143.github.io/dow-s2p-summary/Catman/Create%20Category%20Plan.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <p class="video-caption">Build structured, AI-ready category plans in SAP Ariba today — eliminating the manual overhead of category planning and creating the intelligence layer for AI</p>
+    </div>
+
+    <!-- Video 2 -->
+    <div class="video-block">
+      <span class="avail-tag avail-future">→ &nbsp;Future Direction</span>
+      <div class="vb-title">Category Management with Joule AI — From Manual to Continuously Intelligent</div>
+      <div class="vb-subtitle">Turning a Static Annual Process into a Live Intelligence Feed</div>
+      <p class="vb-desc">Without a unified spend intelligence platform, category managers lack real-time visibility into spend concentration, supplier risk, and market shifts — leaving strategy updates to an annual cycle. The Category Management AI Agent closes this gap. It continuously detects market signals, monitors supplier performance and spend concentration, and automatically surfaces category plan update recommendations — turning a fully manual process into a continuously optimized one.</p>
+      <div class="video-player-wrap">
+        <video controls>
+          <source src="https://moex0143.github.io/dow-s2p-summary/Catman/Category%20Management%20Joule%20Update.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <p class="video-caption">Joule detects market signals and recommends category plan updates in real time — from limited AI to a continuously intelligent category management process</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     FOUNDATION DIAGRAM
+═════════════════════════════════════════════════ -->
+<div class="foundation-wrap">
+  <div class="foundation-inner">
+
+    <div class="found-hdr">
+      <div class="found-diamond"></div>
+      <div class="found-title">Category Management Data is the FOUNDATION for Intelligent eSourcing</div>
+    </div>
+
+    <div class="found-grid">
+
+      <!-- Left -->
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#4a5a8a;margin-bottom:10px;text-align:center;">Category Intelligence (Input)</div>
+        <div class="found-left">
+          <div class="found-card-hdr">
+            <div class="found-icon purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.5 2A5.5 5.5 0 0 0 4 7.5c0 1.6.72 3.04 1.85 4.01C4.72 12.48 4 13.9 4 15.5A5.5 5.5 0 0 0 9.5 21H12"/>
+                <path d="M14.5 2A5.5 5.5 0 0 1 20 7.5c0 1.6-.72 3.04-1.85 4.01"/>
+                <path d="M12 2v19M8 9h.01M16 9h.01M8 15h8"/>
+              </svg>
+            </div>
+            <div class="found-card-title">Ariba Category Intelligence (Input)</div>
+          </div>
+          <div class="bdc-card">
+            <div class="bdc-label">Data Foundation</div>
+            <div class="bdc-row">
+              <div class="bdc-tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="14" width="4" height="7"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="4" width="4" height="17"/></svg>
+                Spend Analytics and Intelligence &nbsp;·&nbsp; Business Data Cloud
+              </div>
+              <span style="color:#7070b0;font-size:11px;">→</span>
+              <span class="bdc-feeds">feeds category plans</span>
+            </div>
+            <div class="bdc-desc"><strong>Clean, categorized spend data is a critical prerequisite.</strong> Accurate spend classification, supplier concentration analysis, and commodity benchmarks must flow from Spend Analytics and Intelligence into category strategy before AI can effectively reason over them.</div>
+          </div>
+          <ul class="found-bullets">
+            <li>Structured category plans &amp; strategy</li>
+            <li>Unified spend visibility &amp; benchmarks</li>
+            <li>Live market signals &amp; commodity trends</li>
+            <li>Supplier positioning, risk &amp; concentration</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Middle: Joule -->
+      <div class="found-mid">
+        <div class="found-mid-label">AI Quality<br>Input</div>
+        <div class="joule-gem-wrap">
+          <svg width="58" height="66" viewBox="0 0 54 62" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gem1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="#e879f9"/>
+                <stop offset="48%"  stop-color="#9333ea"/>
+                <stop offset="100%" stop-color="#4f46e5"/>
+              </linearGradient>
+              <linearGradient id="gem2" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,.22)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+              </linearGradient>
+            </defs>
+            <polygon points="27,2 52,19 44,60 10,60 2,19" fill="url(#gem1)"/>
+            <polygon points="27,2 52,19 27,25 2,19" fill="url(#gem2)"/>
+            <polygon points="27,25 52,19 44,60 27,60" fill="rgba(0,0,0,.12)"/>
+            <polygon points="27,7 44,19 27,23 10,19" fill="rgba(255,255,255,.13)"/>
+          </svg>
+          <div class="joule-label">Joule</div>
+        </div>
+        <div class="mid-chevrons"><div class="chevron"></div><div class="chevron"></div></div>
+        <div class="found-mid-bot">Sharper<br>Reasoning</div>
+      </div>
+
+      <!-- Right -->
+      <div class="found-right-col">
+        <div class="found-right-label">Ariba Sourcing Outcomes (Result)</div>
+        <div class="found-right">
+          <div class="found-card-hdr">
+            <div class="found-icon teal">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+            <div class="found-card-title">Ariba Sourcing via Joule — Execution</div>
+          </div>
+          <ul class="found-bullets">
+            <li>More targeted RFx events &amp; supplier shortlists</li>
+            <li>Sharper bid analysis &amp; award scenarios</li>
+            <li>Better-informed negotiations &amp; pricing leverage</li>
+            <li>Higher savings capture across the spend portfolio</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /found-grid -->
+
+    <p class="found-note"><strong>Spend Analytics and Intelligence (BDC) feeds Ariba Category Intelligence — and clean, categorized data is the prerequisite for everything above.</strong> Accurate spend classification and supplier visibility must be in place before AI can sharpen an RFx event, a bid analysis, or a negotiation. Activating Spend Analytics and Intelligence now builds the data foundation that multiplies the value of every sourcing agent available in October 2026.</p>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     SECTION 2 — INTELLIGENT ESOURCING
+═════════════════════════════════════════════════ -->
+<div class="content-section alt">
+  <div class="section-inner">
+
+    <div class="sec-eyebrow">Intelligent eSourcing</div>
+    <h2 class="sec-title">AI-Powered RFx at Scale</h2>
+    <hr class="sec-rule" />
+
+    <!-- Video 3 -->
+    <div class="video-block">
+      <span class="avail-tag avail-nextgen">◆ &nbsp;NextGen Only</span>
+      <div class="vb-title">Creating Sourcing Events — Do More, Save More</div>
+      <div class="vb-subtitle">The Execution Engine Behind 2.3X Cost Savings</div>
+      <div class="kpi-callout">
+        <span class="kpi-callout-num">2.3X</span>
+        <span class="kpi-callout-text">more cost savings realized vs. "starters" — driven by sourcing event volume and competitive tension</span>
+      </div>
+      <p class="vb-desc">Category management leaders realize 2.3X more cost savings than organizations just getting started — and a critical driver is the volume and quality of sourcing events run. Today, RFx processes are resource-intensive: sourcing teams spend the majority of their time on event administration rather than strategic supplier engagement. Fewer events means less competitive tension, weaker pricing, and savings left on the table. With Joule, the same team runs significantly more events — removing the administration bottleneck, increasing competitive tension across every category, and closing the gap between "starter" performance and leader results.</p>
+      <div class="video-player-wrap">
+        <video controls>
+          <source src="https://moex0143.github.io/dow-s2p-summary/Catman/RFP%20Draft%20in%20nextgen%20UI.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <p class="video-caption">Run more sourcing events, capture more savings — AI removes the RFx administration bottleneck and enables the sourcing team to focus on strategy and supplier relationships</p>
+    </div>
+
+    <!-- Video 4 -->
+    <div class="video-block">
+      <span class="avail-tag avail-nextgen">◆ &nbsp;NextGen Only</span>
+      <div class="vb-title">Renegotiation Agent — Bid Analysis &amp; Award at Scale</div>
+      <div class="vb-subtitle">AI Precision That Captures the Full 2.3X Savings Opportunity</div>
+      <div class="kpi-callout">
+        <span class="kpi-callout-num">2.3X</span>
+        <span class="kpi-callout-text">more cost savings — the gap between leaders and starters is in execution quality, not just strategy</span>
+      </div>
+      <p class="vb-desc">The gap between a category management "starter" and a leader isn't just in strategy — it's in execution precision. Leaders squeeze more savings out of every sourcing event through rigorous bid analysis, scenario modeling, and award optimization. The Renegotiation Agent handles all of this autonomously: bid scoring, scenario analysis, and award recommendations are executed by Joule while the sourcing team focuses on supplier relationships and market strategy. The result is every event reaching its maximum savings potential — consistently, at scale, across the entire spend portfolio.</p>
+      <div class="video-player-wrap">
+        <video controls>
+          <source src="https://moex0143.github.io/dow-s2p-summary/Catman/RFP%20Bid%20Analysis.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <p class="video-caption">Joule handles the execution layer — autonomous bid scoring, award recommendations, and scenario analysis. The sourcing team focuses on supplier relationships and market strategy.</p>
+    </div>
+
+  </div>
+</div>
+
+<div style="height:52px;background:#edf1f7;"></div>
+
+</body>
+</html>
